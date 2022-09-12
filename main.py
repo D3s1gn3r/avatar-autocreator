@@ -4,11 +4,6 @@ import os
 from os.path import exists
 import requests
 
-
-
-
-
-
 if __name__ == '__main__':
     if len(sys.argv) > 3:
         if sys.argv[1] == 'request':
