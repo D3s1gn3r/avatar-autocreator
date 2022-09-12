@@ -1,14 +1,28 @@
 import cv2
 import sys
+import os
 from os.path import exists
+import requests
+
+
+
+
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 2 and exists(sys.argv[1]):
-        imageName = sys.argv[1]
-        imageAvatarName = sys.argv[2]
+    if len(sys.argv) > 3:
+        if sys.argv[1] == 'request':
+            imageNameUrl = sys.argv[2]
+            imageNameUrlDate = imageNameUrl.split('/')
+            response = requests.get(imageNameUrl)
+            imageName = 'temp/'+imageNameUrlDate[len(imageNameUrlDate)-1]
+            open(imageName, "wb").write(response.content)
+        elif sys.argv[1] == 'file' and exists(sys.argv[2]):
+            imageName = sys.argv[2]
+        else:
+            exit(0)
 
-        # image data
+        imageAvatarName = sys.argv[3]
         img = cv2.imread(imageName)
         grayImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         imgHeight, imgWidth, _ = img.shape
@@ -48,3 +62,6 @@ if __name__ == '__main__':
 
                 crop = img[y1:y2, x1:x2]
                 cv2.imwrite(imageAvatarName, crop)
+
+        if sys.argv[1] == 'request':
+            os.unlink(imageName)
