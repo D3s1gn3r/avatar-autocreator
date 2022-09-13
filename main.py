@@ -3,27 +3,32 @@ import sys
 import os
 from os.path import exists
 import requests
+import pathlib
+
 
 if __name__ == '__main__':
+    filePath = pathlib.Path(__file__).parent.resolve()
     if len(sys.argv) > 3:
         if sys.argv[1] == 'request':
             imageNameUrl = sys.argv[2]
             imageNameUrlDate = imageNameUrl.split('/')
             response = requests.get(imageNameUrl)
-            imageName = 'temp/'+imageNameUrlDate[len(imageNameUrlDate)-1]
+            if response.status_code != 200:
+                exit()
+            imageName = str(filePath) + '/temp/'+imageNameUrlDate[len(imageNameUrlDate)-1]
             open(imageName, "wb").write(response.content)
         elif sys.argv[1] == 'file' and exists(sys.argv[2]):
-            imageName = sys.argv[2]
+            imageName = str(filePath) + '/../' + sys.argv[2]
         else:
             exit(0)
 
-        imageAvatarName = sys.argv[3]
+        imageAvatarName = str(filePath)+'/../'+sys.argv[3]
         img = cv2.imread(imageName)
         grayImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         imgHeight, imgWidth, _ = img.shape
 
         # dataset
-        faces = cv2.CascadeClassifier('haarcascade_faces.xml')
+        faces = cv2.CascadeClassifier(str(filePath)+'/haarcascade_faces.xml')
 
         # founded faces
         results = faces.detectMultiScale(grayImg, scaleFactor=1.4, minNeighbors=1)
